@@ -1,0 +1,15 @@
+--- devtools-orig/sign.php	2017-01-04 18:34:09.928778758 +0000
++++ devtools/sign.php	2017-01-04 18:36:55.627907834 +0000
+@@ -119,6 +119,12 @@
+ 	if ($f == "module.sig") {
+ 		continue;
+ 	}
++        if ($argv[4] == "--framework") {
++           if (substr($f, 0, 8) != "amp_conf" && !in_array($f, ['README.md', 'LICENSE', 'install.php', 'module.xml'])) {
++             continue;
++           }
++        }
++
+ 	fwrite($fh, "$f = $h\n");
+ }
+ fwrite ($fh, ";# End\n");

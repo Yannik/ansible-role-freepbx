@@ -1,0 +1,2 @@
+- name: Reload asterisk modules
+  command: asterisk -rx "module reload"
