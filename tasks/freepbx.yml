@@ -15,6 +15,9 @@
     - tar vxfz freepbx.tgz
     - rm freepbx.tgz
 
+- name: Add asterisk user
+  user: name=asterisk
+
 - name: Install required pear package (but not from pear ;))
   command: composer require pear/console_getopt
   args:
@@ -64,9 +67,6 @@
   args:
     chdir: /usr/src/freepbx
     creates: /var/www/freepbx
-
-- name: Add asterisk user
-  user: name=asterisk
 
 - name: Set permissions
   file: path={{ item }} state=directory owner=asterisk group=asterisk recurse=yes
