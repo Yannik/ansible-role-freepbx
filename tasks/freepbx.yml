@@ -125,6 +125,7 @@
       directory = /var/lib/php5/sessions
     marker: "; {mark} ANSIBLE MANAGED BLOCK"
     dest: /etc/asterisk/freepbx_chown.conf
+    create: yes
 
 - name: Install systemd freepbx service
   copy: src=freepbx.service dest=/etc/systemd/system/freepbx.service mode=755
