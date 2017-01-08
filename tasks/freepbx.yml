@@ -129,6 +129,11 @@
 
 - name: Install systemd freepbx service
   copy: src=freepbx.service dest=/etc/systemd/system/freepbx.service mode=755
+  when: ansible_service_mgr == "systemd"
+
+- name: Install upstart freepbx service
+  copy: src=freepbx.upstart dest=/etc/init/freepbx.conf
+  when: ansible_service_mgr == "upstart"
 
 - name: Find libmyodbc.so
   shell: dpkg -L libmyodbc |grep libmyodbc.so$
