@@ -78,6 +78,9 @@
     - /var/spool/asterisk
     - /usr/lib/asterisk
 
+- name: Install python-mysqldb (required for ansible mysql_* modules)
+  apt: pkg=python-mysqldb state=present
+
 - name: Add mysql user
   mysql_user:
     name: "{{ asterisk_db_user }}"
