@@ -2,6 +2,7 @@
 - hosts: localhost
   remote_user: root
   roles:
+    - geerlingguy.composer
     - ansible-role-freepbx
   vars:
     asterisk_db_password: passw0rd
