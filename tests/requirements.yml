@@ -1,5 +1,4 @@
 - name: Yannik.asterisk
-  src: https://github.com/Yannik/ansible-role-asterisk.git
 - name: Yannik.php
 - name: geerlingguy.composer
 
