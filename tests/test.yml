@@ -2,6 +2,8 @@
 - hosts: localhost
   remote_user: root
   roles:
+    - role: Yannik.php
+      php_install_versions: ['5.6']
     - geerlingguy.composer
     - ansible-role-freepbx
   vars:
