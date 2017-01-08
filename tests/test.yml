@@ -2,7 +2,7 @@
 - hosts: localhost
   remote_user: root
   roles:
-    - asterisk
+    - Yannik.asterisk
     - role: Yannik.php
       php_install_versions: ['5.6']
     - geerlingguy.composer
