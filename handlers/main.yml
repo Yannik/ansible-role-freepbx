@@ -1,2 +1,3 @@
 - name: Reload asterisk modules
   command: asterisk -rx "module reload"
+  when: not freepbx_started|changed

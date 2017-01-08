@@ -1,0 +1,14 @@
+# FreePBX / Asterisk
+#
+# Asterisk Phone System and FreePBX Web App
+
+description	"FreePBX"
+
+start on started mysql
+stop on stopping mysql
+
+pre-stop exec /usr/sbin/fwconsole stop
+
+pre-start exec /usr/sbin/fwconsole start
+
+exec sleep infinity
