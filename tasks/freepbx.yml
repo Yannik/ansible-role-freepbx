@@ -93,6 +93,16 @@
     collation: utf8_general_ci
     state: present
 
+- name: Set permissions for installation
+  file: path={{ item }} state=directory owner=asterisk group=asterisk recurse=yes
+  with_items:
+    - /var/run/asterisk
+    - /etc/asterisk
+    - /var/lib/asterisk
+    - /var/log/asterisk
+    - /var/spool/asterisk
+    - /usr/lib/asterisk
+
 - name: Install freepbx (just ran once)
   command: "{{ item }}"
   args:
@@ -157,7 +167,7 @@
     creates: /var/www/freepbx/admin/modules/{{ item }}
   with_items: "{{ freepbx_modules }}"
 
-- name: Set permissions
+- name: Fix permissions if modified by installation
   file: path={{ item }} state=directory owner=asterisk group=asterisk recurse=yes
   with_items:
     - /var/run/asterisk
