@@ -173,5 +173,3 @@
   service: name=freepbx state=started
   register: freepbx_started
 
-- debug: var=freepbx_started
-
