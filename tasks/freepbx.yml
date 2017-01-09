@@ -167,16 +167,6 @@
     creates: /var/www/freepbx/admin/modules/{{ item }}
   with_items: "{{ freepbx_modules }}"
 
-- name: Fix permissions if modified by installation
-  file: path={{ item }} state=directory owner=asterisk group=asterisk recurse=yes
-  with_items:
-    - /var/run/asterisk
-    - /etc/asterisk
-    - /var/lib/asterisk
-    - /var/log/asterisk
-    - /var/spool/asterisk
-    - /usr/lib/asterisk
-
 - name: Disable Asterisk service and stop asterisk
   service: name=asterisk enabled=no state=stopped
   changed_when: false # this apparantly always reports changed
@@ -187,4 +177,14 @@
 - name: Start freepbx
   service: name=freepbx state=started
   register: freepbx_started
+
+- name: Fix permissions if modified by installation
+  file: path={{ item }} state=directory owner=asterisk group=asterisk recurse=yes
+  with_items:
+    - /var/run/asterisk
+    - /etc/asterisk
+    - /var/lib/asterisk
+    - /var/log/asterisk
+    - /var/spool/asterisk
+    - /usr/lib/asterisk
 
