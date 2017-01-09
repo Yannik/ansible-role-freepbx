@@ -137,6 +137,7 @@
 
 - name: Find libmyodbc.so
   shell: dpkg -L libmyodbc |grep libmyodbc.so$
+  changed_when: false
   register: freepbx_libmyodbc_result
 
 # http://community.freepbx.org/t/fixing-cdr-cel-on-ubuntu-debian-installation/30836
@@ -165,6 +166,7 @@
 
 - name: Disable Asterisk service and stop asterisk
   service: name=asterisk enabled=no state=stopped
+  changed_when: false # this apparantly always reports changed
 
 - name: Enable freepbx service
   service: name=freepbx enabled=yes
