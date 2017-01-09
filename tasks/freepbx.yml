@@ -68,16 +68,6 @@
     chdir: /usr/src/freepbx
     creates: /var/www/freepbx
 
-- name: Set permissions
-  file: path={{ item }} state=directory owner=asterisk group=asterisk recurse=yes
-  with_items:
-    - /var/run/asterisk
-    - /etc/asterisk
-    - /var/lib/asterisk
-    - /var/log/asterisk
-    - /var/spool/asterisk
-    - /usr/lib/asterisk
-
 - name: Install python-mysqldb (required for ansible mysql_* modules)
   apt: pkg=python-mysqldb state=present
 
@@ -162,7 +152,20 @@
   notify: Reload asterisk modules
 
 - name: Install freepbx modules
-  command: "fwconsole ma downloadinstall {{ freepbx_modules|join(' ') }}"
+  command: "fwconsole ma downloadinstall {{ item }}"
+  args:
+    creates: /var/www/freepbx/admin/modules/{{ item }}
+  with_items: "{{ freepbx_modules }}"
+
+- name: Set permissions
+  file: path={{ item }} state=directory owner=asterisk group=asterisk recurse=yes
+  with_items:
+    - /var/run/asterisk
+    - /etc/asterisk
+    - /var/lib/asterisk
+    - /var/log/asterisk
+    - /var/spool/asterisk
+    - /usr/lib/asterisk
 
 - name: Disable Asterisk service and stop asterisk
   service: name=asterisk enabled=no state=stopped
