@@ -93,7 +93,7 @@
     collation: utf8_general_ci
     state: present
 
-- name: Set permissions for installation
+- name: Set permissions
   file: path={{ item }} state=directory owner=asterisk group=asterisk recurse=yes
   with_items:
     - /var/run/asterisk
@@ -102,6 +102,8 @@
     - /var/log/asterisk
     - /var/spool/asterisk
     - /usr/lib/asterisk
+  register: freepbx_set_permissions
+  changed_when: not ansible_env.CI and freepbx_set_permissions|changed
 
 - name: Install freepbx (just ran once)
   command: "{{ item }}"
@@ -177,14 +179,4 @@
 - name: Start freepbx
   service: name=freepbx state=started
   register: freepbx_started
-
-- name: Fix permissions if modified by installation
-  file: path={{ item }} state=directory owner=asterisk group=asterisk recurse=yes
-  with_items:
-    - /var/run/asterisk
-    - /etc/asterisk
-    - /var/lib/asterisk
-    - /var/log/asterisk
-    - /var/spool/asterisk
-    - /usr/lib/asterisk
 
