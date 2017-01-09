@@ -9,4 +9,6 @@ stop on stopping mysql
 
 pre-stop exec /usr/sbin/fwconsole stop
 
-exec /usr/sbin/fwconsole start
+pre-start exec /usr/sbin/fwconsole start
+
+exec sleep infinity
