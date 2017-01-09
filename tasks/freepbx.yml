@@ -103,7 +103,7 @@
     - /var/spool/asterisk
     - /usr/lib/asterisk
   register: freepbx_set_permissions
-  changed_when: not ansible_env.CI and freepbx_set_permissions|changed
+  changed_when: (ansible_env.CI is not defined or not ansible_env.CI) and freepbx_set_permissions|changed
 
 - name: Install freepbx (just ran once)
   command: "{{ item }}"
