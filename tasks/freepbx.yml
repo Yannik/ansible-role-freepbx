@@ -166,6 +166,12 @@
 - name: Disable Asterisk service and stop asterisk
   service: name=asterisk enabled=no state=stopped
 
-- name: Enable systemd service and start freepbx
-  service: name=freepbx enabled=yes state=started
+- name: Enable freepbx service
+  service: name=freepbx enabled=yes
+
+- name: Start freepbx
+  service: name=freepbx state=started
+  register: freepbx_started
+
+- debug: var=freepbx_started
 
