@@ -1,5 +1,5 @@
-- name: Yannik.asterisk
-- name: ngpestelos.mysql
+- src: https://github.com/Yannik/provision_docker.git
+  name: provision_docker
 - name: Yannik.php
 - name: geerlingguy.composer
 

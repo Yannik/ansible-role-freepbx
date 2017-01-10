@@ -1,0 +1,14 @@
+- include: docker-setup.yml
+- hosts: asterisk-docker
+  become: no
+  gather_facts: no # python is not installed, so we cannot gather facts
+  pre_tasks:
+    - raw: apt-get update
+      changed_when: false
+    - raw: apt-get install -y --no-install-recommends python
+      changed_when: false
+    - setup:
+  roles:
+    - role: Yannik.php
+      php_install_versions: ['5.6']
+    - geerlingguy.composer

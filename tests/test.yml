@@ -1,11 +1,10 @@
 ---
-- hosts: localhost
-  remote_user: root
+- include: docker-setup.yml
+- hosts: asterisk-docker
+  become: no
   roles:
-    - Yannik.asterisk
-    - role: Yannik.php
-      php_install_versions: ['5.6']
-    - geerlingguy.composer
     - ansible-role-freepbx
   vars:
     asterisk_db_password: passw0rd
+    asterisk_db_host: "{{ hostvars['mysql-docker']['docker_ip'] }}"
+

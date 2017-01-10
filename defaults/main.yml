@@ -1,3 +1,4 @@
+asterisk_db_host: localhost
 asterisk_db_user: asterisk
 asterisk_db_dbname: asterisk
 asterisk_db_cdrdbname: asteriskcdrdb

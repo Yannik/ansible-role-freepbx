@@ -11,17 +11,26 @@ addons:
     - python-pip
     - python-apt
 
+services:
+  - docker
+
 install:
   # Install ansible
   - pip install ansible
 
+  # don't use travis virtualenv, as ansible does not do so either
+  # and couldn't find the docker package that way
+  - sudo /usr/bin/pip install docker-py
+
   # Create ansible.cfg with correct roles_path
   - printf '[defaults]\nroles_path=../' >ansible.cfg
 
-script:
   # Install requirements
   - ansible-galaxy install -r tests/requirements.yml -p ../
+  
+  - ansible-playbook tests/prepare.yml -i tests/inventory --connection=local --sudo
 
+script:
   # Syntax check
   - ansible-playbook tests/test.yml -i tests/inventory --syntax-check
 
@@ -31,7 +40,7 @@ script:
   # Run playbook again to check idempotency
   - >
     ansible-playbook tests/test.yml -i tests/inventory --connection=local --sudo
-    | grep -q 'changed=0.*failed=0'
+    | grep -q 'asterisk-docker.*changed=0.*failed=0'
     && (echo 'Idempotence test: pass' && exit 0)
     || (echo 'Idempotence test: fail' && exit 1)
 

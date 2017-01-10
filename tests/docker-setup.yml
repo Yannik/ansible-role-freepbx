@@ -1,0 +1,20 @@
+---
+- name: Bring up containers
+  hosts: localhost
+  roles:
+    - role: provision_docker
+      provision_docker_privileged: true
+      provision_docker_inventory: "{{ inventory }}"
+      provision_docker_use_docker_connection: True
+  vars:
+    inventory:
+      - name: "asterisk-docker"
+        image: "yanniksembritzki/asterisk:latest"
+        command: sh -c 'while true; do sleep 1; done'
+        restart: false
+      - name: "mysql-docker"
+        # can't use latest due to https://stackoverflow.com/questions/36374335/error-in-mysql-when-setting-default-value-for-date-or-datetime, as the install script sets exactly this default for the calldate in the cdrdb
+        image: "mysql:5.6"
+        restart: false
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: true
