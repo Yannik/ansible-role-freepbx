@@ -103,6 +103,14 @@
     login_host: "{{ asterisk_db_host }}"
     state: present
 
+- name: Setup logrotate
+  copy:
+    src: logrotate
+    dest: /etc/logrotate.d/asterisk
+    mode: 0644
+    owner: root
+    group: root
+
 - name: Set permissions
   file: path={{ item }} state=directory owner=asterisk group=asterisk recurse=yes
   with_items:
