@@ -1,2 +1,2 @@
-- include: freepbx.yml
+- import_tasks: freepbx.yml
   tags: freepbx
