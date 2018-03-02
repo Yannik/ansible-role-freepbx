@@ -1,5 +1,5 @@
 ---
-- import_tasks: docker-setup.yml
+- import_playbook: docker-setup.yml
 - hosts: asterisk-docker
   become: no
   roles:
