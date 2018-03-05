@@ -7,7 +7,9 @@
     - sudo # required by freepbx install script
     - net-tools # fwconsole requirement
     - cron # required by freepbx ucp package
-  when: item != 'libmyodbc' || (ansible_distribution != 'Debian' || ansible_distribution_version|int < 7)
+  when: item != 'libmyodbc' or
+        ansible_distribution != 'Debian' or
+        ansible_distribution_version | version_compare('9' '<')
 
 - name: Install asterisk
   apt: name=asterisk state=present
