@@ -15,7 +15,8 @@
   apt: name=asterisk state=present
   when: freepbx_install_asterisk
 
-- shell: cat /etc/asterisk/asterisk.conf
+- shell: cat /etc/odbc*
+
 - name: fix things
   replace:
     path: /etc/asterisk/asterisk.conf
@@ -206,10 +207,17 @@
   copy: src=freepbx.upstart dest=/etc/init/freepbx.conf
   when: ansible_service_mgr == "upstart"
 
+- name: Download Mariadb odbc module
+  shell: curl -s https://downloads.mariadb.com/Connectors/odbc/connector-odbc-3.0.3/mariadb-connector-odbc-3.0.3-ga-debian-x86_64.tar.gz | sudo tar --extract --gunzip --strip-components=2 --directory /lib64/ --no-anchored 'libmaodbc.so'
+  args:
+   creates: /lib64/libmaodbc.so
+
 - name: Find libmyodbc.so
   shell: dpkg -L libmyodbc |grep libmyodbc.so$
   changed_when: false
   register: freepbx_libmyodbc_result
+  when: ansible_distribution != 'Debian' or
+        ansible_distribution_version | version_compare('9' '<')
 
 # http://community.freepbx.org/t/fixing-cdr-cel-on-ubuntu-debian-installation/30836
 # Test using `isql -v MySQL-asteriskcdrdb`
@@ -231,6 +239,7 @@
     regexp: /var/lib/mysql/mysql.sock
     replace: /var/run/mysqld/mysqld.sock
   notify: Reload asterisk modules
+
 
 - name: Install freepbx modules
   command: "fwconsole ma downloadinstall {{ item }}"
