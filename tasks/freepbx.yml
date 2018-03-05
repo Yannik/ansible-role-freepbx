@@ -3,15 +3,28 @@
   with_items:
     - wget # for downloading freepbx
     - git # for using the git module
+    - unixodbc # for asterisk cdr
     - libmyodbc # for asterisk cdr
     - sudo # required by freepbx install script
     - net-tools # fwconsole requirement
     - cron # required by freepbx ucp package
-  when: item != 'libmyodbc' || (ansible_distribution != 'Debian' || ansible_distribution_version|int < 7)
+  when: item != 'libmyodbc' or
+        ansible_distribution != 'Debian' or
+        ansible_distribution_version | version_compare('9' '<')
 
 - name: Install asterisk
   apt: name=asterisk state=present
   when: freepbx_install_asterisk
+
+- shell: find /etc/ -name "odbc*" -exec ls -alsh {} \;
+- shell: find /etc/ -name "odb*" -exec cat {} \;
+
+- name: fix things
+  replace:
+    path: /etc/asterisk/asterisk.conf
+    regexp: '^\[directories\]\(!\)$'
+    replace: '[directories]'
+- shell: cat /etc/asterisk/asterisk.conf
 
 - name: Download freepbx
   command: wget -O freepbx.tgz http://mirror.freepbx.org/modules/packages/freepbx/freepbx-13.0-latest.tgz
@@ -26,7 +39,7 @@
     - rm freepbx.tgz
 
 - name: Add asterisk user
-  user: name=asterisk
+  user: name=asterisk createhome=yes home=/home/asterisk
 
 - name: Install required pear package (but not from pear ;))
   command: composer require pear/console_getopt
@@ -56,7 +69,7 @@
 
 - name: Create a signing key
   shell: >
-    echo "Key-Type: 1\\nKey-Length: 2048\\nName-Real: Local Freepbx signing key\\nExpire-Date: 0" | gpg --batch --gen-key
+    echo "Key-Type: 1\\nKey-Length: 2048\\nName-Real: Local Freepbx signing key\\nExpire-Date: 0\\n%no-protection" | gpg --batch --gen-key
   args:
     creates: /home/asterisk/local_signing_key.pub
   register: freepbx_signing_key_status
@@ -71,8 +84,15 @@
   args:
     creates: /home/asterisk/local_signing_key.pub
 
+- shell: ls -alsh /home/asterisk/
+- shell: chown asterisk:asterisk /home/asterisk/local_signing_key.pub
+- shell: ls -alsh /home/asterisk/local_signing_key.pub
+- shell: cat /home/asterisk/local_signing_key.pub
+
 - name: Import signing key for asterisk user
-  command: su - asterisk -c 'gpg --import /home/asterisk/local_signing_key.pub'
+  command: gpg --import /home/asterisk/local_signing_key.pub
+  become: true
+  become_user: asterisk
   when: freepbx_signing_key_status|changed
 
 # we can get the key using `gpg --with-colons --list-keys "Local Freepbx signing key" | awk -F: '/^pub:/ { print $5 }'`
@@ -189,10 +209,20 @@
   copy: src=freepbx.upstart dest=/etc/init/freepbx.conf
   when: ansible_service_mgr == "upstart"
 
+- shell: find /etc/ -name "odbc*" -exec ls -alsh {} \;
+- shell: find /etc/ -name "odb*" -exec cat {} \;
+
+- name: Download Mariadb odbc module
+  shell: curl -s https://downloads.mariadb.com/Connectors/odbc/connector-odbc-3.0.3/mariadb-connector-odbc-3.0.3-ga-debian-x86_64.tar.gz | sudo tar --extract --gunzip --strip-components=2 --directory /lib64/ --no-anchored 'libmaodbc.so'
+  args:
+   creates: /lib64/libmaodbc.so
+
 - name: Find libmyodbc.so
   shell: dpkg -L libmyodbc |grep libmyodbc.so$
   changed_when: false
   register: freepbx_libmyodbc_result
+  when: ansible_distribution != 'Debian' or
+        ansible_distribution_version | version_compare('9' '<')
 
 # http://community.freepbx.org/t/fixing-cdr-cel-on-ubuntu-debian-installation/30836
 # Test using `isql -v MySQL-asteriskcdrdb`
@@ -214,6 +244,7 @@
     regexp: /var/lib/mysql/mysql.sock
     replace: /var/run/mysqld/mysqld.sock
   notify: Reload asterisk modules
+
 
 - name: Install freepbx modules
   command: "fwconsole ma downloadinstall {{ item }}"
