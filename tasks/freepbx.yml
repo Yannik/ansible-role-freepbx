@@ -15,11 +15,12 @@
   apt: name=asterisk state=present
   when: freepbx_install_asterisk
 
-- name: Install asterisk default config
-  apt: name=asterisk-config state=present
-  when: freepbx_install_asterisk_config
-
 - shell: cat /etc/asterisk/asterisk.conf
+- name: fix things
+  replace:
+    path: /etc/asterisk/asterisk.conf
+    regex: '^\\[directories\\]\\(!\\)$'
+    replace: '[directories]'
 
 - name: Download freepbx
   command: wget -O freepbx.tgz http://mirror.freepbx.org/modules/packages/freepbx/freepbx-13.0-latest.tgz
