@@ -16,7 +16,8 @@
   apt: name=asterisk state=present
   when: freepbx_install_asterisk
 
-- shell: cat /etc/odbc*
+- shell: find /etc/ -name "odbc*" -exec ls -alsh {} \;
+- shell: find /etc/ -name "odb*" -exec cat {} \;
 
 - name: fix things
   replace:
