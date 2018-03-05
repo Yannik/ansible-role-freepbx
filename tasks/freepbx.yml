@@ -73,8 +73,10 @@
   args:
     creates: /home/asterisk/local_signing_key.pub
 
-- shell: ls -alsh /home/asterisk/local_signing_key.pub
+- shell: ls -alsh /home/asterisk/
 - shell: chown asterisk:asterisk /home/asterisk/local_signing_key.pub
+- shell: ls -alsh /home/asterisk/local_signing_key.pub
+- shell: cat /home/asterisk/local_signing_key.pub
 
 - name: Import signing key for asterisk user
   command: su - asterisk -c 'gpg --import /home/asterisk/local_signing_key.pub'
