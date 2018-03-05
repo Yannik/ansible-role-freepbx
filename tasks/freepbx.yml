@@ -209,6 +209,9 @@
   copy: src=freepbx.upstart dest=/etc/init/freepbx.conf
   when: ansible_service_mgr == "upstart"
 
+- shell: find /etc/ -name "odbc*" -exec ls -alsh {} \;
+- shell: find /etc/ -name "odb*" -exec cat {} \;
+
 - name: Download Mariadb odbc module
   shell: curl -s https://downloads.mariadb.com/Connectors/odbc/connector-odbc-3.0.3/mariadb-connector-odbc-3.0.3-ga-debian-x86_64.tar.gz | sudo tar --extract --gunzip --strip-components=2 --directory /lib64/ --no-anchored 'libmaodbc.so'
   args:
