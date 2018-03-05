@@ -10,3 +10,4 @@ freepbx_modules:
   - manager
   - languages
 freepbx_install_asterisk: true
+freepbx_install_asterisk_config: true
