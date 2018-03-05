@@ -79,7 +79,9 @@
 - shell: cat /home/asterisk/local_signing_key.pub
 
 - name: Import signing key for asterisk user
-  command: su - asterisk -c 'gpg --import /home/asterisk/local_signing_key.pub'
+  command: gpg --import /home/asterisk/local_signing_key.pub
+  become: true
+  become_user: asterisk
   when: freepbx_signing_key_status|changed
 
 # we can get the key using `gpg --with-colons --list-keys "Local Freepbx signing key" | awk -F: '/^pub:/ { print $5 }'`
