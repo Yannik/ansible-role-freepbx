@@ -29,7 +29,7 @@
     - rm freepbx.tgz
 
 - name: Add asterisk user
-  user: name=asterisk
+  user: name=asterisk createhome=yes
 
 - name: Install required pear package (but not from pear ;))
   command: composer require pear/console_getopt
