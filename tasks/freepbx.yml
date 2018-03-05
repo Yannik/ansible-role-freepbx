@@ -58,7 +58,7 @@
 
 - name: Create a signing key
   shell: >
-    echo "Key-Type: 1\\nKey-Length: 2048\\nName-Real: Local Freepbx signing key\\nExpire-Date: 0%no-protection" | gpg --batch --gen-key
+    echo "Key-Type: 1\\nKey-Length: 2048\\nName-Real: Local Freepbx signing key\\nExpire-Date: 0\\n%no-protection" | gpg --batch --gen-key
   args:
     creates: /home/asterisk/local_signing_key.pub
   register: freepbx_signing_key_status
