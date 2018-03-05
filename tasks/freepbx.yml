@@ -7,7 +7,6 @@
     - sudo # required by freepbx install script
     - net-tools # fwconsole requirement
     - cron # required by freepbx ucp package
-    - gnupg1 # debian stretch provides gpg2 by default
   when: item != 'libmyodbc' or
         ansible_distribution != 'Debian' or
         ansible_distribution_version | version_compare('9' '<')
@@ -73,6 +72,9 @@
   shell: gpg --export -a {{ freepbx_signing_key.stdout }} > /home/asterisk/local_signing_key.pub
   args:
     creates: /home/asterisk/local_signing_key.pub
+
+- shell: ls -alsh /home/asterisk/local_signing_key.pub
+- shell: chown asterisk:asterisk /home/asterisk/local_signing_key.pub
 
 - name: Import signing key for asterisk user
   command: su - asterisk -c 'gpg --import /home/asterisk/local_signing_key.pub'
