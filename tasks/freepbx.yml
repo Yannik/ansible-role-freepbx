@@ -7,6 +7,7 @@
     - sudo # required by freepbx install script
     - net-tools # fwconsole requirement
     - cron # required by freepbx ucp package
+    - gnupg1 # debian stretch provides gpg2 by default
   when: item != 'libmyodbc' or
         ansible_distribution != 'Debian' or
         ansible_distribution_version | version_compare('9' '<')
@@ -58,7 +59,7 @@
 
 - name: Create a signing key
   shell: >
-    export GPG_TTY=$(tty) && echo "Key-Type: 1\\nKey-Length: 2048\\nName-Real: Local Freepbx signing key\\nExpire-Date: 0" | gpg --batch --gen-key
+    echo "Key-Type: 1\\nKey-Length: 2048\\nName-Real: Local Freepbx signing key\\nExpire-Date: 0" | gpg --batch --gen-key
   args:
     creates: /home/asterisk/local_signing_key.pub
   register: freepbx_signing_key_status
