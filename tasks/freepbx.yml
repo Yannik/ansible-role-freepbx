@@ -3,6 +3,7 @@
   with_items:
     - wget # for downloading freepbx
     - git # for using the git module
+    - unixodbc # for asterisk cdr
     - libmyodbc # for asterisk cdr
     - sudo # required by freepbx install script
     - net-tools # fwconsole requirement
