@@ -19,7 +19,7 @@
 - name: fix things
   replace:
     path: /etc/asterisk/asterisk.conf
-    regex: '^\\[directories\\]\\(!\\)$'
+    regex: '^\[directories\]\(!\)$'
     replace: '[directories]'
 - shell: cat /etc/asterisk/asterisk.conf
 
