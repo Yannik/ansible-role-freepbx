@@ -35,7 +35,7 @@ script:
   - ansible-playbook tests/test.yml -i tests/inventory --syntax-check
 
   # Run playbook
-  - ansible-playbook tests/test.yml -i tests/inventory --connection=local --sudo
+  - ansible-playbook tests/test.yml -v -i tests/inventory --connection=local --sudo
 
   # Run playbook again to check idempotency
   - >
