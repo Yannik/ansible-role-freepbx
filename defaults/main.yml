@@ -9,3 +9,4 @@ freepbx_modules:
   - backup
   - manager
   - languages
+freepbx_install_asterisk: true
