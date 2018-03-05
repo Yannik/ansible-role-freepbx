@@ -29,7 +29,7 @@
     - rm freepbx.tgz
 
 - name: Add asterisk user
-  user: name=asterisk createhome=yes
+  user: name=asterisk createhome=yes home=/home/asterisk
 
 - name: Install required pear package (but not from pear ;))
   command: composer require pear/console_getopt
@@ -65,12 +65,12 @@
   register: freepbx_signing_key_status
 
 - name: Get signing key
-  shell: "gpg1 --with-colons --list-keys 'Local Freepbx signing key' | awk -F: '/^pub:/ { print $5 }'"
+  shell: "gpg --with-colons --list-keys 'Local Freepbx signing key' | awk -F: '/^pub:/ { print $5 }'"
   changed_when: false
   register: freepbx_signing_key
 
 - name: Export signing key
-  shell: gpg1 --export -a {{ freepbx_signing_key.stdout }} > /home/asterisk/local_signing_key.pub
+  shell: gpg --export -a {{ freepbx_signing_key.stdout }} > /home/asterisk/local_signing_key.pub
   args:
     creates: /home/asterisk/local_signing_key.pub
 
