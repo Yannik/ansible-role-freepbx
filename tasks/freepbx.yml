@@ -10,24 +10,15 @@
     - cron # required by freepbx ucp package
   when: item != 'libmyodbc' or
         ansible_distribution != 'Debian' or
-        ansible_distribution_version | version_compare('9' '<')
+        ansible_distribution_major_version is version(9, '<')
 
 - name: Install asterisk
   apt: name=asterisk state=present
   when: freepbx_install_asterisk
 
-- shell: find /etc/ -name "odbc*" -exec ls -alsh {} \;
-- shell: find /etc/ -name "odb*" -exec cat {} \;
-
-- name: fix things
-  replace:
-    path: /etc/asterisk/asterisk.conf
-    regexp: '^\[directories\]\(!\)$'
-    replace: '[directories]'
-- shell: cat /etc/asterisk/asterisk.conf
-
+# we are NOT using the git repo, because otherwise freepbx will complain that the 'framework' module is not signed
 - name: Download freepbx
-  command: wget -O freepbx.tgz http://mirror.freepbx.org/modules/packages/freepbx/freepbx-13.0-latest.tgz
+  command: wget -O freepbx.tgz http://mirror.freepbx.org/modules/packages/freepbx/freepbx-15.0-latest.tgz
   args:
     chdir: /usr/src
     creates: /usr/src/freepbx
@@ -40,67 +31,6 @@
 
 - name: Add asterisk user
   user: name=asterisk createhome=yes home=/home/asterisk
-
-- name: Install required pear package (but not from pear ;))
-  command: composer require pear/console_getopt
-  args:
-    chdir: /usr/src/freepbx/amp_conf/htdocs/admin/libraries/Composer
-    creates: vendor/pear/console_getopt
-
-- name: Get freepbx devtools
-  git:
-    repo: http://git.freepbx.org/scm/freepbx/devtools.git
-    dest: /usr/src/freepbx-devtools
-    depth: 1
-    update: no
-
-# After installing freepbx, the framework module only consists of the directory
-# `/var/www/freepbx/admin/modules/framework` with very few files, so signing
-# this is useless and we must sign the src before installing.
-# (This appears to be the same as freepbx does it, as the path's are `amp_conf/`
-# in the original module.sig too)
-# However, in the src tarball there are some additional files that would
-# be getting signed but not installed, so we need to patch the signing tool
-# to exclude these files.
-# (Signing is necessary due to the changed composer files by installing
-# `pear/console_getopt`)
-- name: Patch devtools sign.php
-  patch: src=sign.patch dest=/usr/src/freepbx-devtools/sign.php
-
-- name: Create a signing key
-  shell: >
-    echo "Key-Type: 1\\nKey-Length: 2048\\nName-Real: Local Freepbx signing key\\nExpire-Date: 0\\n%no-protection" | gpg --batch --gen-key
-  args:
-    creates: /home/asterisk/local_signing_key.pub
-  register: freepbx_signing_key_status
-
-- name: Get signing key
-  shell: "gpg --with-colons --list-keys 'Local Freepbx signing key' | awk -F: '/^pub:/ { print $5 }'"
-  changed_when: false
-  register: freepbx_signing_key
-
-- name: Export signing key
-  shell: gpg --export -a {{ freepbx_signing_key.stdout }} > /home/asterisk/local_signing_key.pub
-  args:
-    creates: /home/asterisk/local_signing_key.pub
-
-- shell: ls -alsh /home/asterisk/
-- shell: chown asterisk:asterisk /home/asterisk/local_signing_key.pub
-- shell: ls -alsh /home/asterisk/local_signing_key.pub
-- shell: cat /home/asterisk/local_signing_key.pub
-
-- name: Import signing key for asterisk user
-  command: gpg --import /home/asterisk/local_signing_key.pub
-  become: true
-  become_user: asterisk
-  when: freepbx_signing_key_status|changed
-
-# we can get the key using `gpg --with-colons --list-keys "Local Freepbx signing key" | awk -F: '/^pub:/ { print $5 }'`
-- name: Sign framework
-  command: /usr/src/freepbx-devtools/sign.php . --local {{ freepbx_signing_key.stdout }} --framework
-  args:
-    chdir: /usr/src/freepbx
-    creates: /var/www/freepbx
 
 - name: Install python-mysqldb (required for ansible mysql_* modules)
   apt: pkg=python-mysqldb state=present
@@ -161,19 +91,16 @@
     regexp: '(?P<firstpart>\$amp_conf\[.AMPDBHOST.\] = .)localhost(.;)'
     replace: '\g<firstpart>{{ asterisk_db_host }}\2'
 
-- name: Fix freepbx install script to use remote CDR db
-  lineinfile:
-    dest: /usr/src/freepbx/installlib/installcommand.class.php
-    line: >-
-      $installer_amp_conf['CDRDBHOST'] = '{{ asterisk_db_host }}';
-    insertafter: "{{ '$installer_amp_conf = $amp_conf;'|regex_escape() }}"
-
-- name: Fix freepbx install script to use cdr db (only works if cdrdbtype is specified...)
-  lineinfile:
-    dest: /usr/src/freepbx/installlib/installcommand.class.php
-    line: >-
-      $installer_amp_conf['CDRDBTYPE'] = 'mysql';
-    insertafter: "$installer_amp_conf.*CDRDBHOST'"
+- name: Don't let freepbx take over the php sessions dir
+  blockinfile:
+    content: |
+      [blacklist]
+      directory = /var/lib/php/sessions
+    marker: "; {mark} ANSIBLE MANAGED BLOCK"
+    dest: /etc/asterisk/freepbx_chown.conf
+    owner: asterisk
+    group: asterisk
+    create: yes
 
 - name: Install freepbx (just ran once)
   command: "{{ item }}"
@@ -184,22 +111,6 @@
     - ./start_asterisk start
     - ./install -n --webroot /var/www/freepbx --dbuser {{ asterisk_db_user }} --dbpass {{ asterisk_db_password }} --dbname {{ asterisk_db_dbname }} --cdrdbname {{ asterisk_db_cdrdbname }}
   register: freepbx_installation
-
-# http://community.freepbx.org/t/freepbx-12-check-online-fails-on-raspi/24270/52
-- name: Re-install ucp so assets are generated
-  command: fwconsole ma downloadinstall ucp
-  when: freepbx_installation|changed
-
-- name: Don't let freepbx take over the php sessions dir
-  blockinfile:
-    content: |
-      [blacklist]
-      directory = /var/lib/php5/sessions
-    marker: "; {mark} ANSIBLE MANAGED BLOCK"
-    dest: /etc/asterisk/freepbx_chown.conf
-    owner: asterisk
-    group: asterisk
-    create: yes
 
 - name: Install systemd freepbx service
   copy: src=freepbx.service dest=/etc/systemd/system/freepbx.service mode=755
@@ -212,17 +123,20 @@
 - shell: find /etc/ -name "odbc*" -exec ls -alsh {} \;
 - shell: find /etc/ -name "odb*" -exec cat {} \;
 
-- name: Download Mariadb odbc module
-  shell: curl -s https://downloads.mariadb.com/Connectors/odbc/connector-odbc-3.0.3/mariadb-connector-odbc-3.0.3-ga-debian-x86_64.tar.gz | sudo tar --extract --gunzip --strip-components=2 --directory /lib64/ --no-anchored 'libmaodbc.so'
-  args:
-   creates: /lib64/libmaodbc.so
-
 - name: Find libmyodbc.so
   shell: dpkg -L libmyodbc |grep libmyodbc.so$
   changed_when: false
   register: freepbx_libmyodbc_result
-  when: ansible_distribution != 'Debian' or
-        ansible_distribution_version | version_compare('9' '<')
+  when: (ansible_distribution != 'Debian' or
+        ansible_distribution_version is version(9, '<'))
+        and libodbc_path == ""
+
+- name: Set libodbc_path from previous action
+  set_fact:
+    libodbc_path: freepbx_libmyodbc_result.stdout
+  when: (ansible_distribution != 'Debian' or
+        ansible_distribution_version is version(9, '<'))
+        and libodbc_path == ""
 
 # http://community.freepbx.org/t/fixing-cdr-cel-on-ubuntu-debian-installation/30836
 # Test using `isql -v MySQL-asteriskcdrdb`
@@ -234,7 +148,7 @@
     content: |
       [MySQL]
       Description = ODBC for MySQL
-      Driver      = {{ freepbx_libmyodbc_result.stdout }}
+      Driver      = {{ libodbc_path }}
       FileUsage   = 1
   notify: Reload asterisk modules
 
@@ -244,7 +158,6 @@
     regexp: /var/lib/mysql/mysql.sock
     replace: /var/run/mysqld/mysqld.sock
   notify: Reload asterisk modules
-
 
 - name: Install freepbx modules
   command: "fwconsole ma downloadinstall {{ item }}"
