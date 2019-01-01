@@ -120,9 +120,6 @@
   copy: src=freepbx.upstart dest=/etc/init/freepbx.conf
   when: ansible_service_mgr == "upstart"
 
-- shell: find /etc/ -name "odbc*" -exec ls -alsh {} \;
-- shell: find /etc/ -name "odb*" -exec cat {} \;
-
 - name: Find libmyodbc.so
   shell: dpkg -L libmyodbc |grep libmyodbc.so$
   changed_when: false
