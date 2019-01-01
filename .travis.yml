@@ -22,6 +22,9 @@ install:
   # and couldn't find the docker package that way
   - sudo /usr/bin/pip install docker-py
 
+  # otherwise asterisk install_prereq makes problems
+  - sudo apt upgrade -y
+
   # Create ansible.cfg with correct roles_path
   - printf '[defaults]\nroles_path=../' >ansible.cfg
 
