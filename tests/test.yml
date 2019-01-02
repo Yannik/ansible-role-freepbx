@@ -4,6 +4,9 @@
   become: no
   roles:
     - ansible-role-freepbx
+
+  environment:
+    CI: true
   vars:
     asterisk_db_password: passw0rd
     asterisk_db_host: "{{ hostvars['mysql-docker']['docker_ip'] }}"
