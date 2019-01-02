@@ -8,6 +8,9 @@
     - net-tools # fwconsole requirement
     - cron # required by freepbx ucp package
 
+- name: Add asterisk user
+  user: name=asterisk createhome=yes home=/home/asterisk
+
 - name: Install asterisk
   apt: name=asterisk state=present
   when: freepbx_install_asterisk
@@ -24,9 +27,6 @@
   with_items:
     - tar vxfz freepbx.tgz
     - rm freepbx.tgz
-
-- name: Add asterisk user
-  user: name=asterisk createhome=yes home=/home/asterisk
 
 - name: Install python-mysqldb (required for ansible mysql_* modules)
   apt: pkg=python-mysqldb state=present
