@@ -9,7 +9,7 @@
   vars:
     inventory:
       - name: "asterisk-docker"
-        image: "debian:stretch"
+        image: "yanniksembritzki/asterisk:latest"
         command: sh -c 'while true; do sleep 1; done'
         restart: false
       - name: "mysql-docker"

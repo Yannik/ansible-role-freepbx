@@ -9,4 +9,4 @@
   vars:
     asterisk_db_password: passw0rd
     asterisk_db_host: "{{ hostvars['mysql-docker']['docker_ip'] }}"
-
+    freepbx_install_asterisk: false
