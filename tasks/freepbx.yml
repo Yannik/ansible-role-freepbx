@@ -4,13 +4,9 @@
     - wget # for downloading freepbx
     - git # for using the git module
     - unixodbc # for asterisk cdr
-    - libmyodbc # for asterisk cdr
     - sudo # required by freepbx install script
     - net-tools # fwconsole requirement
     - cron # required by freepbx ucp package
-  when: item != 'libmyodbc' or
-        ansible_distribution != 'Debian' or
-        ansible_distribution_major_version is version(9, '<')
 
 - name: Install asterisk
   apt: name=asterisk state=present
