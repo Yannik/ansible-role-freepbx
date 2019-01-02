@@ -116,21 +116,6 @@
   copy: src=freepbx.upstart dest=/etc/init/freepbx.conf
   when: ansible_service_mgr == "upstart"
 
-- name: Find libmyodbc.so
-  shell: dpkg -L libmyodbc |grep libmyodbc.so$
-  changed_when: false
-  register: freepbx_libmyodbc_result
-  when: (ansible_distribution != 'Debian' or
-        ansible_distribution_version is version(9, '<'))
-        and libodbc_path == ""
-
-- name: Set libodbc_path from previous action
-  set_fact:
-    libodbc_path: freepbx_libmyodbc_result.stdout
-  when: (ansible_distribution != 'Debian' or
-        ansible_distribution_version is version(9, '<'))
-        and libodbc_path == ""
-
 # http://community.freepbx.org/t/fixing-cdr-cel-on-ubuntu-debian-installation/30836
 # Test using `isql -v MySQL-asteriskcdrdb`
 - name: Fix asterisk cdr odbc connection (1)
