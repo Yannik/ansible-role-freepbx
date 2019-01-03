@@ -2,4 +2,5 @@
   name: provision_docker
 - name: Yannik.php
 - name: geerlingguy.composer
+- name: geerlingguy.nodejs
 
