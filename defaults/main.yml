@@ -3,11 +3,8 @@ asterisk_db_user: asterisk
 asterisk_db_dbname: asterisk
 asterisk_db_cdrdbname: asteriskcdrdb
 freepbx_modules:
-  - userman
- #- ucp
   - asteriskinfo
   - backup
-  - outroutemsg # workaround for https://issues.freepbx.org/browse/FREEPBX-15249
 freepbx_install_asterisk: true
 # required on debian 9 with mariadb
 libodbc_path: ""
