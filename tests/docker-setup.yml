@@ -17,4 +17,4 @@
         image: "mysql:5.6"
         restart: false
         env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: true
+          MYSQL_ALLOW_EMPTY_PASSWORD: "true"
