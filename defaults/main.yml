@@ -8,3 +8,11 @@ freepbx_modules:
 freepbx_install_asterisk: true
 # required on debian 9 with mariadb
 libodbc_path: ""
+asterisk_packages:
+  - asterisk
+  - asterisk-mp3
+  - asterisk-mysql
+  - asterisk-opus
+  - asterisk-prompt-de
+  - asterisk-moh-opsound-*
+  - asterisk-core-sounds-en-*

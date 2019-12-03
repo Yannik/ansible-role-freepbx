@@ -13,7 +13,8 @@
   user: name=asterisk createhome=yes home=/home/asterisk
 
 - name: Install asterisk
-  apt: name=asterisk state=present
+  apt:
+    pkg: "{{ asterisk_packages }}"
   when: freepbx_install_asterisk
 
 # we are NOT using the git repo, because otherwise freepbx will complain that the 'framework' module is not signed
