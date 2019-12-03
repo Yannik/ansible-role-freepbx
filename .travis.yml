@@ -28,7 +28,7 @@ install:
   # Install requirements
   - ansible-galaxy install -r tests/requirements.yml -p ../
   
-  - ansible-playbook tests/prepare.yml -i tests/inventory --connection=local --sudo
+  - ansible-playbook tests/prepare.yml -i tests/inventory --connection=local --become
 
 script:
   # Syntax check
