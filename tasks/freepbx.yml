@@ -145,6 +145,10 @@
     creates: /var/www/freepbx/admin/modules/{{ item }}
   with_items: "{{ freepbx_modules }}"
 
+- name: copy .my.cnf file with root password credentials
+  template: src="my.cnf.j2" dest="/home/asterisk/.my.cnf" owner=asterisk group=asterisk mode=0600
+  when: mariadb_root_password is defined
+
 - name: Enable freepbx service
   service: name=freepbx enabled=yes
   when: ansible_connection != 'docker'
