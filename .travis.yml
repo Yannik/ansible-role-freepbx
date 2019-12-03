@@ -2,7 +2,6 @@
 language: python
 python: "2.7"
 
-sudo: true
 dist: xenial
 
 addons:
@@ -38,7 +37,7 @@ script:
   - ansible-playbook tests/test.yml -v -i tests/inventory --connection=local --sudo
 
   # Run playbook again to check idempotency
-  - ansible-playbook tests/test.yml --diff -i tests/inventory --connection=local --sudo | tee idempotence-test.log
+  - ansible-playbook tests/test.yml --diff -i tests/inventory --connection=local --become | tee idempotence-test.log
   - >
     grep -q 'asterisk-docker.*changed=0.*failed=0' idempotence-test.log
     && (echo 'Idempotence test: pass' && exit 0)
