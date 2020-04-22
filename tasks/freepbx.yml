@@ -106,7 +106,7 @@
 # only be used if it is included in another config (it's not by default)
 # However, the freepbx installer uses these value for installation, which can
 # then lead to inconsistencies
- - name: Replace [directories](!) with [directories] on first install
+- name: Replace [directories](!) with [directories] on first install
   command: "replace '[directories](!)' '[directores]' -- /etc/asterisk/asterisk.conf"
   args:
    creates: /var/www/freepbx
