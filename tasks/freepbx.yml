@@ -100,6 +100,19 @@
     group: asterisk
     create: yes
 
+# the default (debian) asterisk.conf contains a [directories](!) section with
+# directory values. The (!) indicates that it this section is a template section
+# (https://wiki.asterisk.org/wiki/display/AST/Using+Templates) and will
+# only be used if it is included in another config (it's not by default)
+# However, the freepbx installer uses these value for installation, which can
+# then lead to inconsistencies
+ - name: Replace [directories](!) with [directories] on first install
+  command: "replace '[directories](!)' '[directores]' -- /etc/asterisk/asterisk.conf"
+  args:
+   creates: /var/www/freepbx
+#
+#   I think removing the file is not a good idea, because we should use the default directories, as the may be used by other packages asterisk-moh-sounds for example, for installation 
+
 - name: Install freepbx (just ran once)
   command: "{{ item }}"
   args:
